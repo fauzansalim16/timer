@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Race Timer — Countdown</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- ============ SETTING SCREEN ============ -->
+    <main id="settingScreen" class="screen settingScreen" aria-hidden="false">
+        <div class="settingCard">
+
+            <header class="settingHeader">
+                <span class="eyebrow">Race Timer</span>
+                <h1>Atur Hitung Mundur</h1>
+                <p class="subtitle">Tentukan durasi, lalu mulai saat kamu siap.</p>
+            </header>
+
+            <!-- Duration -->
+            <section class="field-group" aria-labelledby="durationLabel">
+                <label id="durationLabel" class="field-label">Durasi</label>
+                <div class="duration-row">
+                    <div class="duration-unit">
+                        <input type="text" inputmode="numeric" maxlength="2" id="inputHours" class="duration-input"
+                            value="00" aria-label="Jam" />
+                        <span class="duration-unit-label">Jam</span>
+                    </div>
+                    <span class="duration-sep">:</span>
+                    <div class="duration-unit">
+                        <input type="text" inputmode="numeric" maxlength="2" id="inputMinutes" class="duration-input"
+                            value="05" aria-label="Menit" />
+                        <span class="duration-unit-label">Menit</span>
+                    </div>
+                    <span class="duration-sep">:</span>
+                    <div class="duration-unit">
+                        <input type="text" inputmode="numeric" maxlength="2" id="inputSeconds" class="duration-input"
+                            value="00" aria-label="Detik" />
+                        <span class="duration-unit-label">Detik</span>
+                    </div>
+                </div>
+                <p class="field-error" id="durationError" role="alert"></p>
+            </section>
+
+            <!-- Reminder -->
+            <section class="field-group">
+                <div class="field-label-row">
+                    <label for="inputReminder" class="field-label">Reminder (opsional)</label>
+                    <span class="field-hint">Bunyi sekali saat sisa waktu mencapai titik ini</span>
+                </div>
+                <div class="reminder-row">
+                    <input type="text" inputmode="numeric" id="inputReminder" class="reminder-input"
+                        placeholder="contoh: 10" maxlength="5" />
+                    <span class="reminder-suffix">detik tersisa</span>
+                </div>
+                <p class="field-error" id="reminderError" role="alert"></p>
+            </section>
+
+            <!-- Actions -->
+            <div class="action-row">
+                <button id="resetSettingBtn" class="btn btn-ghost" type="button">Reset</button>
+                <button id="startBtn" class="btn btn-primary" type="button" disabled>
+                    <span>Start Timer</span>
+                </button>
+            </div>
+
+            <p class="shortcut-hint">Tekan <kbd>Enter</kbd> untuk mulai</p>
+        </div>
+    </main>
+
+    <!-- ============ TIMER SCREEN ============ -->
+    <main id="timerScreen" class="screen timerScreen" aria-hidden="true">
+        <div class="timerStage">
+
+            <div class="progress-wrap">
+                <svg id="progressRing" class="progress-ring" viewBox="0 0 360 360" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="warnGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#f97316" />
+                            <stop offset="100%" stop-color="#ef4444" />
+                        </linearGradient>
+                    </defs>
+                    <!-- tick marks (track lane feel) -->
+                    <g id="tickMarks"></g>
+                    <circle class="ring-track" cx="180" cy="180" r="158" />
+                    <circle id="ringProgress" class="ring-progress" cx="180" cy="180" r="158" />
+                </svg>
+
+                <div class="timer-center">
+                    <div id="timeDisplay" class="time-display" aria-live="off">05:00</div>
+                    <div id="timeSubLabel" class="time-sublabel">tersisa</div>
+                </div>
+            </div>
+
+            <div class="status-row">
+                <span id="statusBadge" class="status-badge">Berjalan</span>
+            </div>
+
+            <div class="controls-row">
+                <button id="resetTimerBtn" class="btn btn-icon" type="button" title="Reset (Esc)">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M4 4v6h6M20 20v-6h-6M5.5 9A7.5 7.5 0 0 1 19 7.5M18.5 15A7.5 7.5 0 0 1 5 16.5"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span>Reset</span>
+                </button>
+
+                <button id="pauseResumeBtn" class="btn btn-primary btn-large" type="button"
+                    title="Pause/Resume (Space)">
+                    <svg id="iconPause" viewBox="0 0 24 24" width="26" height="26">
+                        <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor" />
+                        <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor" />
+                    </svg>
+                    <svg id="iconPlay" viewBox="0 0 24 24" width="26" height="26" style="display:none">
+                        <path d="M7 4l13 8-13 8V4z" fill="currentColor" />
+                    </svg>
+                    <span id="pauseResumeLabel">Pause</span>
+                </button>
+
+                <button id="muteBtn" class="btn btn-icon" type="button" title="Bisukan suara">
+                    <svg id="iconSoundOn" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor" />
+                        <path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                    </svg>
+                    <svg id="iconSoundOff" viewBox="0 0 24 24" width="20" height="20" style="display:none">
+                        <path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor" />
+                        <path d="M16 9l5 5M21 9l-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <span>Suara</span>
+                </button>
+            </div>
+
+            <p class="shortcut-hint">Space = Pause/Resume &nbsp;•&nbsp; Esc = Reset</p>
+        </div>
+    </main>
+
+    <!-- Finish overlay -->
+    <div id="finishOverlay" class="finish-overlay" aria-hidden="true">
+        <div class="finish-card">
+            <div class="finish-icon">🏁</div>
+            <h2>Waktu Habis</h2>
+            <p>Hitung mundur telah selesai.</p>
+            <button id="finishResetBtn" class="btn btn-primary" type="button">Kembali ke Setting</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
