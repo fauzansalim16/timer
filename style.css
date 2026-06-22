@@ -541,64 +541,18 @@ kbd {
     color: rgba(255, 255, 255, 0.3);
 }
 
-/* ==========================================================
-   FINISH OVERLAY
-   ========================================================== */
-.finish-overlay {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(15, 23, 42, 0.72);
-    backdrop-filter: blur(6px);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.4s var(--ease), visibility 0.4s;
-    z-index: 50;
-    padding: 24px;
+.status-badge.finished {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
 }
 
-.finish-overlay.is-active {
-    opacity: 1;
-    visibility: visible;
-}
-
-.finish-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    padding: 44px 36px;
-    text-align: center;
-    max-width: 360px;
+.finish-actions {
+    margin-top: 20px;
     width: 100%;
-    box-shadow: var(--shadow-lifted);
-    transform: translateY(12px) scale(0.96);
-    transition: transform 0.4s var(--ease);
+    max-width: 280px;
 }
 
-.finish-overlay.is-active .finish-card {
-    transform: translateY(0) scale(1);
-}
-
-.finish-icon {
-    font-size: 44px;
-    margin-bottom: 14px;
-}
-
-.finish-card h2 {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 6px;
-}
-
-.finish-card p {
-    font-size: 14px;
-    color: var(--ink-soft);
-    margin-bottom: 24px;
-}
-
-.finish-card .btn-primary {
+.finish-actions .btn-primary {
     width: 100%;
 }
 

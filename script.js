@@ -5,7 +5,7 @@
    ========================================================== */
 const settingScreen = document.getElementById('settingScreen');
 const timerScreen = document.getElementById('timerScreen');
-const finishOverlay = document.getElementById('finishOverlay');
+const finishActions = document.getElementById('finishActions');
 
 const inputHours = document.getElementById('inputHours');
 const inputMinutes = document.getElementById('inputMinutes');
@@ -44,6 +44,7 @@ const state = {
     reminderAt: null,     // titik reminder (detik tersisa), null = nonaktif
     reminderFired: false, // flag agar reminder hanya bunyi 1x
     finishFired: false,
+    isFinished: false,
     isRunning: false,
     isPaused: false,
     intervalId: null,
@@ -365,7 +366,11 @@ function renderTime() {
     timeDisplay.classList.toggle('is-warning', isWarning);
     ringProgress.classList.toggle('is-warning', isWarning);
 
-    if (state.isPaused) {
+    if (state.isFinished) {
+        statusBadge.textContent = 'Waktu Habis';
+        statusBadge.className = 'status-badge finished';
+        timeSubLabel.textContent = 'selesai';
+    } else if (state.isPaused) {
         statusBadge.textContent = 'Dijeda';
         statusBadge.className = 'status-badge paused';
         timeSubLabel.textContent = 'dijeda';
@@ -423,11 +428,13 @@ function finishTimer() {
     stopTimerLoop();
     state.isRunning = false;
     state.isPaused = false;
+    state.isFinished = true;
     if (!state.finishFired) {
         state.finishFired = true;
         AudioSystem.playFinish();
     }
-    showFinishOverlay();
+    showFinishActions();
+    renderTime();
 }
 
 /* ==========================================================
@@ -444,6 +451,7 @@ function goToTimerScreen() {
     state.reminderAt = reminder;
     state.reminderFired = false;
     state.finishFired = false;
+    state.isFinished = false;
     state.isRunning = true;
     state.isPaused = false;
 
@@ -452,6 +460,7 @@ function goToTimerScreen() {
     timerScreen.setAttribute('aria-hidden', 'false');
     settingScreen.setAttribute('aria-hidden', 'true');
 
+    hideFinishActions();
     setPauseUI(false);
     renderTime();
     setRingProgress(1);
@@ -468,18 +477,16 @@ function goToSettingScreen() {
     timerScreen.setAttribute('aria-hidden', 'true');
     settingScreen.setAttribute('aria-hidden', 'false');
 
-    hideFinishOverlay();
+    hideFinishActions();
     validateSettings();
 }
 
-function showFinishOverlay() {
-    finishOverlay.classList.add('is-active');
-    finishOverlay.setAttribute('aria-hidden', 'false');
+function showFinishActions() {
+    finishActions.hidden = false;
 }
 
-function hideFinishOverlay() {
-    finishOverlay.classList.remove('is-active');
-    finishOverlay.setAttribute('aria-hidden', 'true');
+function hideFinishActions() {
+    finishActions.hidden = true;
 }
 
 /* ==========================================================
@@ -528,10 +535,9 @@ muteBtn.addEventListener('click', () => {
    ========================================================== */
 document.addEventListener('keydown', (e) => {
     const isTimerActive = timerScreen.classList.contains('is-active');
-    const isFinishActive = finishOverlay.classList.contains('is-active');
 
     // Enter = Start (hanya di setting screen, dan bukan saat fokus di tombol)
-    if (e.key === 'Enter' && !isTimerActive && !isFinishActive) {
+    if (e.key === 'Enter' && !isTimerActive) {
         e.preventDefault();
         if (!startBtn.disabled) {
             goToTimerScreen();
@@ -540,18 +546,16 @@ document.addEventListener('keydown', (e) => {
     }
 
     // Space = Pause/Resume (hanya saat timer aktif & belum selesai)
-    if (e.code === 'Space' && isTimerActive && !isFinishActive) {
+    if (e.code === 'Space' && isTimerActive && !state.isFinished) {
         e.preventDefault();
         togglePauseResume();
         return;
     }
 
     // Escape = Reset ke setting screen
-    if (e.key === 'Escape') {
-        if (isTimerActive || isFinishActive) {
-            e.preventDefault();
-            goToSettingScreen();
-        }
+    if (e.key === 'Escape' && isTimerActive) {
+        e.preventDefault();
+        goToSettingScreen();
     }
 });
 
