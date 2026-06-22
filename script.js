@@ -388,13 +388,8 @@ function tick() {
 
     state.remainingSeconds -= 1;
 
-    // Reminder: hanya bunyi SEKALI saat tepat mencapai threshold
-    if (
-        state.reminderAt !== null &&
-        !state.reminderFired &&
-        state.remainingSeconds === state.reminderAt
-    ) {
-        state.reminderFired = true;
+    // Reminder: play reminder sound each second when within reminder window
+    if (state.reminderAt !== null && state.remainingSeconds > 0 && state.remainingSeconds <= state.reminderAt) {
         AudioSystem.playReminder();
         pulseBadgeOnce();
     }
